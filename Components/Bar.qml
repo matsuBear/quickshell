@@ -1,39 +1,33 @@
+import Quickshell
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 
-PanelWindow{
-	id:bar
-	anchors{
-		top:true
-		left:true
-		bottom:true
-	}
-
-
-	implicitWidth:50
-
-	ColumnLayout{
-		id:barLayout
+Rectangle{
+	id:trueBar
+	width:Logic.barWidth
+	height:Logic.barHeight
+	radius:90
+	color:"transparent"
+	FlexboxLayout{
+		id:inner
 		anchors.fill:parent
-		spacing:3
-		
-		Rectangle{
-			id:modulesTop
-			implicitHeight:bar.height/4
-			color:"#0000ff"
-			Layout.fillWidth:true
+		direction:FlexboxLayout.Row
+		justifyContent:FlexboxLayout.JustifySpaceEvenly
+		alignItems:FlexboxLayout.AlignCenter
 
-			FlexboxLayout{
-				id:modulesTopBox
-				anchors.fill:parent
-				direction:FlexboxLayout.Column
-				justifyContent:FlexboxLayout.JustifySpaceEvenly
+		LeftModules{
+			Layout.leftMargin:10
 
-				Clock {
-					implicitWidth:bar.implicitWidth
-				}
-			}
+		}
+		CenterModules{}
+		RightModules{
+			Layout.rightMargin:10
 		}
 	}
+	MouseArea {
+		id:barMouser
+		anchors.fill:trueBar
+	}
+
+	Behavior on color{ColorAnimation{}}
 }
