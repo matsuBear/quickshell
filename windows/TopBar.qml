@@ -2,10 +2,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import qs
+import qs.components
 import qs.windows.bar
 
 // The window is a fixed transparent strip across the top of the screen.
-// Only the pill (`bar`) moves; `mask` makes everything else click-through.
+// Only `bar` moves; `mask` makes everything else click-through.
 PanelWindow {
     id: root
 
@@ -14,7 +15,7 @@ PanelWindow {
         left: true
         right: true
     }
-    implicitHeight: Globals.style.barHeight + Globals.style.barMargin * 2
+    implicitHeight: Globals.style.barHeight
     color: "transparent"
 
     exclusionMode: ExclusionMode.Ignore
@@ -26,21 +27,16 @@ PanelWindow {
 
     readonly property bool shown: Globals.ui.barOpen
 
-    Rectangle {
+    Item {
         id: bar
 
         anchors.horizontalCenter: parent.horizontalCenter
-        y: root.shown ? Globals.style.barMargin : -height - Globals.style.borderWidth
-        // stop rendering once fully tucked away
-        visible: y > -height
-
-        width: content.implicitWidth + Globals.style.padding * 4
+        width: panel.width
         height: Globals.style.barHeight
-        radius: Globals.style.radius
 
-        color: Globals.alpha(Globals.colors.bg, Globals.style.opacity)
-        border.width: Globals.style.borderWidth
-        border.color: Globals.colors.border
+        // glued to the top edge; slides fully above the screen when hidden
+        y: root.shown ? 0 : -height
+        visible: y > -height
 
         Behavior on y {
             NumberAnimation {
@@ -48,17 +44,26 @@ PanelWindow {
                 easing.type: Globals.anim.ease
             }
         }
-        // workspaces appearing/disappearing resize the pill
-        Behavior on width {
-            NumberAnimation {
-                duration: Globals.anim.normal
-                easing.type: Globals.anim.ease
+
+        TrapezoidPanel {
+            id: panel
+            height: parent.height
+            innerWidth: content.implicitWidth + Globals.style.padding * 4
+
+            // workspaces appearing/disappearing resize the panel
+            Behavior on innerWidth {
+                NumberAnimation {
+                    duration: Globals.anim.normal
+                    easing.type: Globals.anim.ease
+                }
             }
         }
 
         Row {
             id: content
-            anchors.centerIn: parent
+            anchors.horizontalCenter: parent.horizontalCenter
+            // center in the area above the bottom border
+            y: (parent.height - panel.borderWidth - height) / 2
             spacing: Globals.style.spacing * 2
 
             Clock {
@@ -74,5 +79,4 @@ PanelWindow {
             }
         }
     }
-
 }

@@ -31,7 +31,7 @@ Row {
 
             Behavior on width {
                 NumberAnimation {
-                    duration: Globals.anim.normal
+                    duration: Globals.anim.normal + 3
                     easing.type: Globals.anim.ease
                 }
             }

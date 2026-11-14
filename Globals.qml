@@ -54,6 +54,8 @@ Singleton {
         property color info
         // misc
         property color border
+        property color bgEdge
+        property color bgMid
     }
     readonly property Colors colors: Colors {
         bg:         root.pal.darkCold
@@ -74,6 +76,8 @@ Singleton {
         info:       root.pal.blueAlt
 
         border:     root.pal.midDarkCold
+        bgEdge: root.alpha(root.pal.darkCold, 0.8)
+        bgMid:  root.alpha(root.pal.secdCold, 0.8)
     }
 
     // ── Style / metrics ──────────────────────────────────────
@@ -97,14 +101,18 @@ Singleton {
         // top bar
         readonly property int barHeight: 45
         readonly property int barMargin: 6   // gap between screen top and bar
+
+        // trapezoid panels (bar, later the bottom menu)
+        readonly property real panelAngle:  65   // side slope vs. the screen edge, in degrees (90 = rectangle)
+        readonly property real panelBorder: 2.5  // metallic border thickness
     }
     readonly property Style style: Style {}
 
     // ── Animation ────────────────────────────────────────────
     component Anim: QtObject {
-        readonly property int fast:   120
-        readonly property int normal: 220
-        readonly property int slow:   350
+        readonly property int fast:   180
+        readonly property int normal: 240
+        readonly property int slow:   360
         readonly property int ease:     Easing.OutCubic
         readonly property int easeBack: Easing.OutBack
     }
