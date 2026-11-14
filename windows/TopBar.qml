@@ -5,17 +5,21 @@ import qs
 import qs.components
 import qs.windows.bar
 
-// The window is a fixed transparent strip across the top of the screen.
-// Only `bar` moves; `mask` makes everything else click-through.
+// Top-right corner fan. The window covers the fan's bounding box; only the
+// module row takes clicks, the blades are decoration.
 PanelWindow {
     id: root
 
     anchors {
         top: true
-        left: true
         right: true
     }
-    implicitHeight: Globals.style.barHeight
+
+    readonly property real sw: root.screen?.width ?? 1920
+    readonly property real sh: root.screen?.height ?? 1080
+
+    implicitWidth: Math.round(sw * Globals.style.barReach) + Globals.style.fanMargin
+    implicitHeight: Math.round(sh * Globals.style.barEnds[1]) + Globals.style.fanMargin
     color: "transparent"
 
     exclusionMode: ExclusionMode.Ignore
@@ -23,60 +27,42 @@ PanelWindow {
     WlrLayershell.namespace: "qs-bar"
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
-    mask: Region { item: bar }
-
-    readonly property bool shown: Globals.ui.barOpen
-
+    mask: Region { item: hitbox}
     Item {
-        id: bar
+        id: hitbox
+        x: viewport.x
+        y: viewport.y
+        width: Globals.ui.menuOpen ? viewport.width : 0
+        height: viewport.height
+    }
 
-        anchors.horizontalCenter: parent.horizontalCenter
-        width: panel.width
-        height: Globals.style.barHeight
+    Fan {
+        anchors.fill: parent
+        shown: Globals.ui.barOpen
 
-        // glued to the top edge; slides fully above the screen when hidden
-        y: root.shown ? 0 : -height
-        visible: y > -height
+        cornerTop: true
+        cornerLeft: false
+        uVertical: true
 
-        Behavior on y {
-            NumberAnimation {
-                duration: Globals.anim.normal
-                easing.type: Globals.anim.ease
-            }
-        }
+        zU: root.sh * Globals.style.barDrop
+        aU: 0
+        aV: root.sw * Globals.style.barReach
+        bow: root.sw * Globals.style.barBow
+        ends: Globals.style.barEnds.map(e => e * root.sh)
+        branches: Globals.style.barBranches
+        peel: Globals.style.fanPeel
 
-        TrapezoidPanel {
-            id: panel
-            height: parent.height
-            innerWidth: content.implicitWidth + Globals.style.padding * 4
-
-            // workspaces appearing/disappearing resize the panel
-            Behavior on innerWidth {
-                NumberAnimation {
-                    duration: Globals.anim.normal
-                    easing.type: Globals.anim.ease
-                }
-            }
-        }
-
-        Row {
+        Column {
             id: content
-            anchors.horizontalCenter: parent.horizontalCenter
-            // center in the area above the bottom border
-            y: (parent.height - panel.borderWidth - height) / 2
-            spacing: Globals.style.spacing * 2
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.margins: Globals.style.padding * 2
+            spacing: Globals.style.spacing
 
-            Clock {
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            Workspaces {
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            Battery {
-                anchors.verticalCenter: parent.verticalCenter
-            }
+            Clock      { anchors.right: parent.right }
+            Workspaces { anchors.right: parent.right }
+            NetStatus { anchors.right: parent.right }
+            Battery   { anchors.right: parent.right }
         }
     }
 }

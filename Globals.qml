@@ -102,9 +102,31 @@ Singleton {
         readonly property int barHeight: 45
         readonly property int barMargin: 6   // gap between screen top and bar
 
-        // trapezoid panels (bar, later the bottom menu)
-        readonly property real panelAngle:  65   // side slope vs. the screen edge, in degrees (90 = rectangle)
-        readonly property real panelBorder: 2.5  // metallic border thickness
+        // corner fans — fractions of the screen size (see components/Fan.qml)
+        readonly property int  fanMargin: 24     // window slack for curve bulge + shadow
+        readonly property real fanPeel:   0.2    // how long a back blade hugs the one in front
+
+        // shadows where blades overlap
+        readonly property real shadowOpacity: 0.45
+        readonly property real shadowBlur:    0.6   // 0–1
+        readonly property real shadowOffset:  4     // px, away from the corner
+
+        // bar: top-right corner (u = down the right edge ×H, v = left along the top ×W)
+        readonly property real barReach:    0.31          // front blade along the top edge (×W)
+        readonly property real barDrop:     0.20          // front blade down the right edge (×H)
+        readonly property real barBow:      -0.01         // curve bulge (×W); + = toward the corner
+        readonly property var  barEnds:     [0.33, 0.50]  // middle / back blades on the right edge (×H)
+        readonly property var  barBranches: [0.75, 0.45] // where they peel off (0 = right edge end, 1 = top end)
+
+        // menu: bottom-left corner (u = right along the bottom ×W, v = up the left edge)
+        readonly property real menuFoot:    0.38          // front blade on the bottom edge (×W)
+        readonly property real menuHead:    0.12          // front blade on the top edge (×W)
+        readonly property real menuBow:     -0.015        // curve bulge (×W); + = toward the corner
+        readonly property var  menuEnds:    [0.48, 0.58]  // middle / back blades on the bottom edge (×W)
+        readonly property var  menuBranches: [0.72, 0.5]  // where they peel off (0 = bottom end, 1 = top end)
+        readonly property real menuContentHeight: 0.6     // page area height (×H), bottom-aligned
+        readonly property int  menuPadding: 18
+        readonly property int  menuColumns: 3
     }
     readonly property Style style: Style {}
 
@@ -112,7 +134,10 @@ Singleton {
     component Anim: QtObject {
         readonly property int fast:   180
         readonly property int normal: 240
-        readonly property int slow:   360
+        readonly property int slow:   600
+        readonly property int stagger: 70   // delay between layered pieces
+        readonly property int close:  200             // fan blades retracting
+        readonly property int easeIn: Easing.InCubic  // accelerate out of view
         readonly property int ease:     Easing.OutCubic
         readonly property int easeBack: Easing.OutBack
     }
@@ -120,7 +145,19 @@ Singleton {
 
     // ── Icons (Nerd Font glyphs) ─────────────────────────────
     component Icons: QtObject {
-        readonly property string bolt: String.fromCodePoint(0xF140B) // nf-md-lightning_bolt
+        readonly property string bolt:      String.fromCodePoint(0xF140B) // nf-md-lightning_bolt
+        readonly property string back:      String.fromCodePoint(0xF004D) // nf-md-arrow_left
+        readonly property string settings:  String.fromCodePoint(0xF0493) // nf-md-cog
+        readonly property string music:     String.fromCodePoint(0xF075A) // nf-md-music
+        readonly property string bell:      String.fromCodePoint(0xF009A) // nf-md-bell
+        readonly property string wifi:      String.fromCodePoint(0xF05A9) // nf-md-wifi
+        readonly property string bluetooth: String.fromCodePoint(0xF00AF) // nf-md-bluetooth
+        readonly property string wifi1:    String.fromCodePoint(0xF091F) // nf-md-wifi_strength_1
+        readonly property string wifi2:    String.fromCodePoint(0xF0922) // nf-md-wifi_strength_2
+        readonly property string wifi3:    String.fromCodePoint(0xF0925) // nf-md-wifi_strength_3
+        readonly property string wifi4:    String.fromCodePoint(0xF0928) // nf-md-wifi_strength_4
+        readonly property string wifiOff:  String.fromCodePoint(0xF092E) // nf-md-wifi_strength_off_outline
+        readonly property string ethernet: String.fromCodePoint(0xF0200) // nf-md-ethernet
     }
     readonly property Icons icons: Icons {}
 
@@ -129,9 +166,29 @@ Singleton {
     component Ui: QtObject {
         property bool barOpen:  false
         property bool menuOpen: false
-        property string menuPage: "settings"
+        property string menuPage: "main"
     }
     readonly property Ui ui: Ui {}
+
+    // ── Menu navigation ──────────────────────────────────────
+    // toggleMenu("")         → open on main / close
+    // toggleMenu("network")  → open straight on a page / close if already there
+    function toggleMenu(page: string): void {
+        if (ui.menuOpen && (page === "" || page === ui.menuPage)) {
+            ui.menuOpen = false;
+            return;
+        }
+        ui.menuPage = page === "" ? "main" : page;
+        ui.menuOpen = true;
+    }
+
+    // Esc / back button: sub-page → main → closed
+    function menuBack(): void {
+        if (ui.menuPage !== "main")
+            ui.menuPage = "main";
+        else
+            ui.menuOpen = false;
+    }
 
     // ── Helpers ──────────────────────────────────────────────
     function alpha(c: color, a: real): color {
