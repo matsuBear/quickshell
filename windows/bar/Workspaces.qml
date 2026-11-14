@@ -25,18 +25,29 @@ Row {
             width: focused ? height * 1.8 : height
             radius: 30
 
-            color: focused ? Globals.colors.accentCold
-                 : hover.containsMouse ? Globals.colors.surface
-                 : "transparent"
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
+                GradientStop {
+                    position: 0.0
+                    color: ws.focused ? Globals.colors.accentCold
+                         : hover.containsMouse ? Globals.colors.surface
+                         : Globals.alpha(Globals.colors.surface, 0)
+                    Behavior on color { ColorAnimation { duration: Globals.anim.fast } }
+                }
+                GradientStop {
+                    position: 1.0
+                    color: ws.focused ? Globals.colors.fg
+                         : hover.containsMouse ? Globals.colors.bgRaised
+                         : Globals.alpha(Globals.colors.bgRaised, 0)
+                    Behavior on color { ColorAnimation { duration: Globals.anim.fast } }
+                }
+            }
 
             Behavior on width {
                 NumberAnimation {
-                    duration: Globals.anim.normal + 3
+                    duration: Globals.anim.normal
                     easing.type: Globals.anim.ease
                 }
-            }
-            Behavior on color {
-                ColorAnimation { duration: Globals.anim.fast }
             }
 
             Text {
