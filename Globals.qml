@@ -112,11 +112,11 @@ Singleton {
         readonly property real shadowOffset:  4     // px, away from the corner
 
         // bar: top-right corner (u = down the right edge ×H, v = left along the top ×W)
-        readonly property real barReach:    0.31          // front blade along the top edge (×W)
-        readonly property real barDrop:     0.20          // front blade down the right edge (×H)
-        readonly property real barBow:      -0.01         // curve bulge (×W); + = toward the corner
-        readonly property var  barEnds:     [0.33, 0.50]  // middle / back blades on the right edge (×H)
-        readonly property var  barBranches: [0.75, 0.45] // where they peel off (0 = right edge end, 1 = top end)
+        readonly property real barReach:    0.29          // front blade along the top edge (×W)
+        readonly property real barDrop:     0.18          // front blade down the right edge (×H)
+        readonly property real barBow:      -0.0001         // curve bulge (×W); + = toward the corner
+        readonly property var  barEnds:     [0.25, 0.34]  // middle / back blades on the right edge (×H)
+        readonly property var  barBranches: [0.75, 0.48] // where they peel off (0 = right edge end, 1 = top end)
 
         // menu: bottom-left corner (u = right along the bottom ×W, v = up the left edge)
         readonly property real menuFoot:    0.38          // front blade on the bottom edge (×W)

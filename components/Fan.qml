@@ -94,6 +94,7 @@ Item {
     Blade {
         fan: root
         index: 2
+        castShadow: true
         GradientStop { position: 0.0; color: Globals.pal.primCold }
         GradientStop { position: 1.0; color: Globals.pal.lightWarm }
     }
@@ -111,7 +112,7 @@ Item {
         index: 0
         castShadow: true
         GradientStop { position: 0.0;  color: Globals.pal.midDarkCold }
-        GradientStop { position: 0.65; color: Globals.pal.secdCold }
+        GradientStop { position: 0.45; color: Globals.pal.secdCold }
         GradientStop { position: 1.0;  color: Globals.pal.midLightCold }
     }
 

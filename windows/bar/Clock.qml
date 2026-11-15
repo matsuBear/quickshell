@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import qs
 
-// "14:32  Monday Sep 9th"
 Row {
     id: root
     spacing: Globals.style.spacing * 2
